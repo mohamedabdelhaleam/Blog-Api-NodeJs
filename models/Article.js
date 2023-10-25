@@ -2,14 +2,14 @@ const mongoose = require("mongoose")
 const schema = mongoose.Schema
 
 const articleSchema = new schema({
-    title: {
-        type : String,
-        required : true
-    },
-    author: String,
+    title: String,
     body: String,
-    comments: [{ body: String, date: Date }],
-    numberOfLikes : Number
+    author: String,
+    date:{type:Date ,default : Date.now()},
+    numberOfLikes : {
+        type : Number ,
+        default : 0
+    }
 })
 
 const Article = mongoose.model("Article", articleSchema)
