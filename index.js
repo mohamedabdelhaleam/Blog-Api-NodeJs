@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const Article = require("./models/Article");
+
+const articleControllers = require("./controllers/article-controller")
 
 const app = express();
 
@@ -17,13 +18,12 @@ mongoose
 
 app.use(express.json());
 
-app.get("/getAllArticle",);
+app.get("/getAllArticle",articleControllers.getAllArticle);
+app.post("/addArticle",articleControllers.addArticle);
+app.get("/getSingleArticle/:articleId",articleControllers.getArticleById);
+app.delete("/deleteArticle/:articleId",articleControllers.deleteArticle);
+app.patch("/updateArticle/:articleId",articleControllers.updateArticle);
 
-app.get("/", (req, res) => {
-  res.json({
-    status: "success",
-  });
-});
 
 app.listen(4000, () => {
   console.log("port Number 4000");
