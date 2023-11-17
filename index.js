@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 
 const articleControllers = require("./controllers/article-controller")
+const articleRoutes = require("./routes/article-routes")
 
 const app = express();
 
@@ -18,11 +19,8 @@ mongoose
 
 app.use(express.json());
 
-app.get("/getAllArticle",articleControllers.getAllArticle);
-app.post("/addArticle",articleControllers.addArticle);
-app.get("/getSingleArticle/:articleId",articleControllers.getArticleById);
-app.delete("/deleteArticle/:articleId",articleControllers.deleteArticle);
-app.patch("/updateArticle/:articleId",articleControllers.updateArticle);
+app.use("/api/Articles",articleRoutes)
+
 
 
 app.listen(4000, () => {
