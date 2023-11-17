@@ -1,5 +1,6 @@
 const express = require("express");
 const Article = require("../models/Article");
+const HttpStatusText = require("../utils/HttpStatusText");
 
 const getAllArticle = async (req, res, next) => {
   const query = req.query;
@@ -11,7 +12,7 @@ const getAllArticle = async (req, res, next) => {
       .limit(limit)
       .skip(skip);
     res.json({
-      status: "success",
+      status: HttpStatusText.SUCCESS,
       data: { Article: article },
     });
   } catch (error) {
@@ -27,12 +28,12 @@ const getArticleById = async (req, res, next) => {
   try {
     const article = await Article.findById(id);
     res.json({
-      status: "success",
+      status: HttpStatusText.SUCCESS,
       data: { Article: article },
     });
   } catch (error) {
     res.json({
-      status: "error",
+      status: HttpStatusText.ERROR,
       message: error.message,
     });
   }
@@ -42,13 +43,13 @@ const deleteArticle = async (req, res, next) => {
   try {
     const article = await Article.deleteOne({ _id: id });
     res.json({
-      status: "success",
+      status: HttpStatusText.SUCCESS,
       message: "Article Deleted Successfully",
       data: null,
     });
   } catch (error) {
     res.json({
-      status: "error",
+      status: HttpStatusText.ERROR,
       message: error.message,
     });
   }
@@ -60,9 +61,8 @@ const updateArticle = async (req, res, next) => {
       { _id: id },
       { $set: { ...req.body } }
     );
-    console.log(req.body);
     res.json({
-      status: "success",
+      status: HttpStatusText.SUCCESS,
       message: "Article Updated Successfully",
       data: {
         Article : article
@@ -70,7 +70,7 @@ const updateArticle = async (req, res, next) => {
     });
   } catch (error) {
     res.json({
-      status: "error",
+      status: HttpStatusText.ERROR,
       message: error.message,
     });
   }
@@ -89,7 +89,7 @@ const addArticle = async (req,res,next)=>{
     newArticle.numberOfLikes = likes
     newArticle.save()
     res.json({
-      status: "success",
+      status: HttpStatusText.SUCCESS,
       message: "Article Added Successfully",
       data: {
         Article : newArticle
@@ -98,7 +98,7 @@ const addArticle = async (req,res,next)=>{
     
   } catch (error) {
     res.json({
-      status: "error",
+      status: HttpStatusText.ERROR,
       message: error.message,
     });
   }
