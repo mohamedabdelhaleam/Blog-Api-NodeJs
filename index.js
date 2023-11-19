@@ -1,8 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
-const articleControllers = require("./controllers/article-controller")
-const articleRoutes = require("./routes/article-routes")
+const articleControllers = require("./controllers/article-controller");
+const articleRoutes = require("./routes/article-routes");
 
 const app = express();
 
@@ -19,9 +19,13 @@ mongoose
 
 app.use(express.json());
 
-app.use("/api/Articles",articleRoutes)
-
-
+app.use("/api/Articles", articleRoutes);
+app.all("*", (req, res) => {
+  return res.status(404).json({
+    status: "error",
+    message: "This Url Not Available",
+  });
+});
 
 app.listen(4000, () => {
   console.log("port Number 4000");
