@@ -26,7 +26,13 @@ const getAllArticle = async (req, res, next) => {
 const getArticleById = async (req, res, next) => {
   const id = req.params.articleId;
   try {
-    const article = await Article.findById(id);
+    const article = await Article.findById({"_id" :id},{"__v":false});
+    if(!article){
+      res.status(404).json({
+        status: HttpStatusText.FAIL,
+        data: { Article: article },
+      });
+    }
     res.json({
       status: HttpStatusText.SUCCESS,
       data: { Article: article },
