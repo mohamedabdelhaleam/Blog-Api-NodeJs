@@ -2,125 +2,91 @@ const express = require("express");
 const Article = require("../models/Article");
 const { validationResult } = require("express-validator");
 const HttpStatusText = require("../utils/HttpStatusText");
+const asyncWrapper = require("../middleware/asyncWrapper");
+const appError = require("../utils/appError");
 
-const getAllArticle = async (req, res, next) => {
+const getAllArticle = asyncWrapper(async (req, res, next) => {
   const query = req.query;
   const limit = query.limit || 8;
   const page = query.page || 1;
   const skip = (page - 1) * limit;
-  try {
-    const article = await Article.find({}, { __v: false })
-      .limit(limit)
-      .skip(skip);
-    res.json({
-      status: HttpStatusText.SUCCESS,
-      data: { Article: article },
-    });
-  } catch (error) {
-    res.json({
-      status: "error",
-      message: error.message,
-    });
-  }
-};
+  const article = await Article.find({}, { __v: false })
+    .limit(limit)
+    .skip(skip);
+  res.json({
+    status: HttpStatusText.SUCCESS,
+    data: { Article: article },
+  });
+});
 
-const getArticleById = async (req, res, next) => {
+const getArticleById = asyncWrapper(async (req, res, next) => {
   const id = req.params.articleId;
-  try {
-    const article = await Article.findById({ _id: id }, { __v: false });
-    if (!article) {
-      res.status(404).json({
-        status: HttpStatusText.FAIL,
-        data: { Article: article },
-      });
-    }
-    res.json({
-      status: HttpStatusText.SUCCESS,
-      data: { Article: article },
-    });
-  } catch (error) {
-    res.json({
-      status: HttpStatusText.ERROR,
-      message: error.message,
-    });
+  const article = await Article.findById({ _id: id }, { __v: false });
+  if (!article) {
+    const error = appError.create(
+      "Article Not Found",
+      404,
+      HttpStatusText.FAIL
+    );
+    return next(error);
   }
-};
-const deleteArticle = async (req, res, next) => {
+  res.json({
+    status: HttpStatusText.SUCCESS,
+    data: { Article: article },
+  });
+});
+const deleteArticle = asyncWrapper(async (req, res, next) => {
   const id = req.params.articleId;
-  try {
-    const article = await Article.deleteOne({ _id: id });
-    res.json({
-      status: HttpStatusText.SUCCESS,
-      message: "Article Deleted Successfully",
-      data: null,
-    });
-  } catch (error) {
-    res.json({
-      status: HttpStatusText.ERROR,
-      message: error.message,
-    });
-  }
-};
-const updateArticle = async (req, res, next) => {
+  const article = await Article.deleteOne({ _id: id });
+  res.json({
+    status: HttpStatusText.SUCCESS,
+    message: "Article Deleted Successfully",
+    data: null,
+  });
+});
+const updateArticle = asyncWrapper(async (req, res, next) => {
   const id = req.params.articleId;
-  const result = validationResult(req);
   if (result.isEmpty()) {
-    try {
-      const article = await Article.updateOne(
-        { _id: id },
-        { $set: { ...req.body } }
-      );
-      res.json({
-        status: HttpStatusText.SUCCESS,
-        message: "Article Updated Successfully",
-        data: {
-          Article: article,
-        },
-      });
-    } catch (error) {
-      res.json({
-        status: HttpStatusText.ERROR,
-        message: error.message,
-      });
-    }
+    const article = await Article.updateOne(
+      { _id: id },
+      { $set: { ...req.body } }
+    );
+    res.json({
+      status: HttpStatusText.SUCCESS,
+      message: "Article Updated Successfully",
+      data: {
+        Article: article,
+      },
+    });
   }
-  res
-    .status(404)
-    .json({ status: HttpStatusText.ERROR, errors: result.array() });
-};
+  const error = appError(result.array(), 404, HttpStatusText.ERROR);
+  return next(error);
+});
 
-const addArticle = async (req, res, next) => {
+const addArticle = asyncWrapper(async (req, res, next) => {
   const title = req.body.title;
   const body = req.body.body;
   const author = req.body.author;
   const likes = req.body.likes;
   const result = validationResult(req);
   if (result.isEmpty()) {
-    try {
-      const newArticle = new Article();
-      newArticle.title = title;
-      newArticle.body = body;
-      newArticle.author = author;
-      newArticle.numberOfLikes = likes;
-      newArticle.save();
-      res.json({
-        status: HttpStatusText.SUCCESS,
-        message: "Article Added Successfully",
-        data: {
-          Article: newArticle,
-        },
-      });
-    } catch (error) {
-      res.json({
-        status: HttpStatusText.ERROR,
-        message: error.message,
-      });
-    }
+    const newArticle = new Article();
+    newArticle.title = title;
+    newArticle.body = body;
+    newArticle.author = author;
+    newArticle.numberOfLikes = likes;
+    newArticle.save();
+    res.json({
+      status: HttpStatusText.SUCCESS,
+      message: "Article Added Successfully",
+      data: {
+        Article: newArticle,
+      },
+    });
   }
-  res
-    .status(404)
-    .json({ status: HttpStatusText.ERROR, errors: result.array() });
-};
+  const error = appError(result.array(), 404, HttpStatusText.ERROR);
+  return next(error);
+});
 
 module.exports = {
   getAllArticle,
