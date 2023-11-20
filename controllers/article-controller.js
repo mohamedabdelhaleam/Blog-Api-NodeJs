@@ -1,6 +1,6 @@
 const express = require("express");
 const Article = require("../models/Article");
-const {validationResult } = require('express-validator');
+const { validationResult } = require("express-validator");
 const HttpStatusText = require("../utils/HttpStatusText");
 
 const getAllArticle = async (req, res, next) => {
@@ -63,9 +63,8 @@ const deleteArticle = async (req, res, next) => {
 };
 const updateArticle = async (req, res, next) => {
   const id = req.params.articleId;
-  const result = validationResult(req)
-  if(result.isEmpty()){
-
+  const result = validationResult(req);
+  if (result.isEmpty()) {
     try {
       const article = await Article.updateOne(
         { _id: id },
@@ -85,7 +84,9 @@ const updateArticle = async (req, res, next) => {
       });
     }
   }
-  res.send({ errors: result.array() });
+  res
+    .status(404)
+    .json({ status: HttpStatusText.ERROR, errors: result.array() });
 };
 
 const addArticle = async (req, res, next) => {
@@ -93,26 +94,32 @@ const addArticle = async (req, res, next) => {
   const body = req.body.body;
   const author = req.body.author;
   const likes = req.body.likes;
-  try {
-    const newArticle = new Article();
-    newArticle.title = title;
-    newArticle.body = body;
-    newArticle.author = author;
-    newArticle.numberOfLikes = likes;
-    newArticle.save();
-    res.json({
-      status: HttpStatusText.SUCCESS,
-      message: "Article Added Successfully",
-      data: {
-        Article: newArticle,
-      },
-    });
-  } catch (error) {
-    res.json({
-      status: HttpStatusText.ERROR,
-      message: error.message,
-    });
+  const result = validationResult(req);
+  if (result.isEmpty()) {
+    try {
+      const newArticle = new Article();
+      newArticle.title = title;
+      newArticle.body = body;
+      newArticle.author = author;
+      newArticle.numberOfLikes = likes;
+      newArticle.save();
+      res.json({
+        status: HttpStatusText.SUCCESS,
+        message: "Article Added Successfully",
+        data: {
+          Article: newArticle,
+        },
+      });
+    } catch (error) {
+      res.json({
+        status: HttpStatusText.ERROR,
+        message: error.message,
+      });
+    }
   }
+  res
+    .status(404)
+    .json({ status: HttpStatusText.ERROR, errors: result.array() });
 };
 
 module.exports = {
