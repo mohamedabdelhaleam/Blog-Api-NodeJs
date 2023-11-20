@@ -1,8 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
-
-const articleControllers = require("./controllers/article-controller");
+const cors = require("cors");
 const articleRoutes = require("./routes/article-routes");
+const HttpStatusText = require("./utils/HttpStatusText");
 
 const app = express();
 
@@ -16,7 +16,7 @@ mongoose
   .catch((error) => {
     console.log("error : ", error);
   });
-
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/Articles", articleRoutes);
@@ -24,6 +24,13 @@ app.all("*", (req, res) => {
   return res.status(404).json({
     status: "error",
     message: "This Url Not Available",
+  });
+});
+
+app.use((error, req, res, next) => {
+  res.status(error.statusCode || 404).json({
+    status: error.statusText || HttpStatusText.ERROR,
+    message: error.message,
   });
 });
 
