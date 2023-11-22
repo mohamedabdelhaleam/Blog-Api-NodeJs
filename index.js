@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const articleRoutes = require("./routes/article-routes");
+const userRoutes = require("./routes/user-routes");
 const HttpStatusText = require("./utils/HttpStatusText");
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/Articles", articleRoutes);
+app.use("/api/Users", userRoutes);
 app.all("*", (req, res) => {
   return res.status(404).json({
     status: "error",
