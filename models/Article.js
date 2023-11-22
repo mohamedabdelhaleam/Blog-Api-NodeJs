@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 const schema = mongoose.Schema
 
-const articleSchema = new schema({
+const articleSchema = new mongoose.Schema({
     title: String,
     body: String,
     author: String,
@@ -12,6 +12,4 @@ const articleSchema = new schema({
     }
 })
 
-const Article = mongoose.model("Article", articleSchema)
-
-module.exports = Article
+module.exports = mongoose.model("Article", articleSchema)
