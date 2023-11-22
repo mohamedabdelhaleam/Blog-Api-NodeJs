@@ -6,7 +6,6 @@ const articleControllers = require("../controllers/article-controller");
 
 router.get("/getAllArticle", articleControllers.getAllArticle);
 
-router.get("/getAllArticle", articleControllers.getAllArticle);
 router.post(
   "/addArticle",
   body("title").notEmpty().escape().isLength({ min: 5, max: 20 }),
